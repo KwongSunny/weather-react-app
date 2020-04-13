@@ -8,5 +8,27 @@
     display:inline-block;
     height:100%;
     width: 200px;
+    text-align:center;
+}
 
+.dailyItem{
+    display:inline-block;
+    height:100%;
+    width: 200px;
+    text-align:center;
+}
+
+.sevenDay{
+    display: none;
+    overflow:auto;
+    white-space:nowrap;
+    height:200px;
+}
+
+.divider{
+    position: relative;
+    top: -30px;
+    height:150px;
+    width:2px;
+    background-color:black;
 }

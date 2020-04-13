@@ -9,6 +9,7 @@ function App() {
   const [currentTime, setCurrentTime] = useState();
   const [hourlyInfo, setHourlyInfo] = useState();
   const [dailyInfo, setDailyInfo] = useState();
+  const [showingHour, setShowingHour] = useState(true);
   const unit = "imperial";
   const appID = "6dd2e40e4f5e4bef22ad159ca06b9dd7";
 
@@ -24,10 +25,26 @@ function App() {
     return months[num];
   }
 
+  const offsetTime = (date, seconds, minutes, hours, days) => {
+    const newDate = new Date();
+    newDate.setTime(date.getMilliseconds()
+      + (seconds * 1000)
+      + (minutes * 1000 * 60)
+      + (hours * 1000 * 60 * 60)
+      + (days * 1000 * 60 * 60 * 24))
+    return newDate;
+  }
+
+  const switchScrollableContent = (thisElement, alternateElement) => {
+    setShowingHour(!showingHour);
+    thisElement.style.display = "block";
+    alternateElement.style.display = "none";
+  }
+
   useEffect(() => {
     if(search !== undefined)
     {
-      axios.get(`http://api.openweathermap.org/data/2.5/weather?q=${search}&units=imperial&${unit}&appid=${appID}`)
+      axios.get(`http://api.openweathermap.org/data/2.5/weather?q=${search}&units=${unit}&appid=${appID}`)
         .then(res => {
           setCurrentTime(new Date());
           setLocation(res.data);
@@ -47,7 +64,7 @@ function App() {
   }, [location])
 
 
-  if(location !== undefined && hourlyInfo !== undefined)
+  if(location !== undefined && hourlyInfo !== undefined && dailyInfo !== undefined)
   {
     return (
       <div className="App">
@@ -66,22 +83,37 @@ function App() {
               <br />
               {`Low: ${location.main.temp_min}`}
           </div>
+          <div>
+            <button onClick = {e => {switchScrollableContent(document.getElementById("hourlyScroll"), document.getElementById("dailyScroll"))}}>48 hour</button>
+            <button onClick = {e => {switchScrollableContent(document.getElementById("dailyScroll"), document.getElementById("hourlyScroll"))}}>15 day</button>
+          </div>
           <div className = {styles.scrollableWeather}>
-              <div className = {styles.hourly}>
+              <div id = "hourlyScroll" className = {styles.hourly}>
                 {
-                  hourlyInfo.map(hour => 
-                    <div className = {styles.hourlyItem}>
-                        {`${numToDay(currentTime.getDay())}
-                        , ${numToMonth(currentTime.getMonth())} ${currentTime.getDate()} ${currentTime.getFullYear()}
-                        , ${currentTime.getHours()}:00`}
-                        : {hour.temp}
-                    </div>
+                  hourlyInfo.map((hour, i) => 
+                      <div className = {styles.hourlyItem}>
+                          {`${(currentTime.getHours() + i)%24}:00`}
+                          <br />
+                          {hour.temp}
+                          <div className = {styles.divider}/> 
+                      </div> 
                   )
                 }
               </div>
-              <div className = {styles.sevenDay}>
+              <div id = "dailyScroll" className = {styles.sevenDay}>
+              {
+                dailyInfo.map((day, i) => 
+                  <div className = {styles.hourlyItem}>
+                      {`${offsetTime(currentTime, 0, 0, 0, 0).getDate()}`}
+                      <br />
+                      {
 
-              </div>
+                      }
+                      <div className = {styles.divider}/> 
+                  </div> 
+                )
+              } 
+             </div>
           </div>
       </div>
     );        
