@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import styles from './App.module.css'
+import styles from './App.module.css';
+import './App.css';
+import SimpleBar from 'simplebar-react';
+import 'simplebar/dist/simplebar.min.css';
 
 function App() {
   const [search, setSearch] = useState();
@@ -12,6 +15,7 @@ function App() {
   const [showingHour, setShowingHour] = useState(true);
   const unit = "imperial";
   const appID = "6dd2e40e4f5e4bef22ad159ca06b9dd7";
+  const testArr = [1, 2, 3, 4, 5, 6, 7, 8,9, 10, 11, 12, 13, 14, 15]; 
 
   //converts 0-6 to the day of the week
   const numToDay = (num) => {
@@ -25,13 +29,31 @@ function App() {
     return months[num];
   }
 
+  const numToHour = (num) => {
+    if(num > 11)
+    {
+      if(num%12 === 0)
+        return `12:00 PM`
+      else return `${num%12}:00 PM`
+    }
+    else
+    {
+      if(num%12 === 0)
+        return `12:00 AM`
+      else return `${num%12}:00 AM`
+    }
+  }
+
   const offsetTime = (date, seconds, minutes, hours, days) => {
-    const newDate = new Date();
-    newDate.setTime(date.getMilliseconds()
+    const newDate = new Date(Date.now());
+    newDate.setTime(
+      Date.now() 
+      + date.getMilliseconds()
       + (seconds * 1000)
       + (minutes * 1000 * 60)
       + (hours * 1000 * 60 * 60)
       + (days * 1000 * 60 * 60 * 24))
+    //console.log(newDate);
     return newDate;
   }
 
@@ -39,6 +61,14 @@ function App() {
     setShowingHour(!showingHour);
     thisElement.style.display = "block";
     alternateElement.style.display = "none";
+  }
+
+  const popDailyInfo = () => {
+    if(dailyInfo.length === 8)
+    {
+      dailyInfo.pop();
+      return dailyInfo;
+    }
   }
 
   useEffect(() => {
@@ -59,9 +89,17 @@ function App() {
       .then(res => {
         setHourlyInfo(res.data.hourly);
         setDailyInfo(res.data.daily);
+        console.log(res.data.daily);
       });
     }
   }, [location])
+
+  useEffect(() => {
+    if(dailyInfo !== undefined && dailyInfo.length === 8){
+      dailyInfo.pop();
+      return dailyInfo;
+    }
+  }, [dailyInfo])
 
 
   if(location !== undefined && hourlyInfo !== undefined && dailyInfo !== undefined)
@@ -75,45 +113,55 @@ function App() {
           <div className = {styles.currentWeather}>
               {`${location.name}, ${location.sys.country}`}
               <br />
-              {`${currentTime}`}
+              {`${numToDay(currentTime.getDay())}, ${numToMonth(currentTime.getMonth())} ${currentTime.getDate()} ${currentTime.getFullYear()}`}
               <br />
-              {`Current: ${location.main.temp}°F`}
+              {`Current: ${Math.round(location.main.temp)}°F`}
               <br />
-              {`High: ${location.main.temp_max}`}
+              {`High: ${Math.round(location.main.temp_max)}°F`}
               <br />
-              {`Low: ${location.main.temp_min}`}
+              {`Low: ${Math.round(location.main.temp_min)}°F`}
+              <br />
+              {`Wind: ${Math.round(location.wind.speed)} MPH`}
           </div>
           <div>
             <button onClick = {e => {switchScrollableContent(document.getElementById("hourlyScroll"), document.getElementById("dailyScroll"))}}>48 hour</button>
-            <button onClick = {e => {switchScrollableContent(document.getElementById("dailyScroll"), document.getElementById("hourlyScroll"))}}>15 day</button>
+            <button onClick = {e => {switchScrollableContent(document.getElementById("dailyScroll"), document.getElementById("hourlyScroll"))}}>7 day</button>
           </div>
           <div className = {styles.scrollableWeather}>
-              <div id = "hourlyScroll" className = {styles.hourly}>
+              <SimpleBar id = "hourlyScroll" className = {styles.hourly}>
+                <div className = {styles.itemSpacer}/>
                 {
                   hourlyInfo.map((hour, i) => 
                       <div className = {styles.hourlyItem}>
-                          {`${(currentTime.getHours() + i)%24}:00`}
+                          {`${numToMonth(offsetTime(currentTime, 0, 0, i, 0).getMonth())} ${offsetTime(currentTime, 0, 0, i, 0).getDate()}`}
+                          <br /> 
+                          {`${numToHour(offsetTime(currentTime, 0, 0, i, 0).getHours())}`}
                           <br />
-                          {hour.temp}
+                          {`${Math.round(hour.temp)}°F`}
+                          <br />
+                          {`Wind: ${Math.round(hour.wind_speed)} MPH`}
                           <div className = {styles.divider}/> 
                       </div> 
                   )
                 }
-              </div>
+              </SimpleBar>
               <div id = "dailyScroll" className = {styles.sevenDay}>
-              {
-                dailyInfo.map((day, i) => 
-                  <div className = {styles.hourlyItem}>
-                      {`${offsetTime(currentTime, 0, 0, 0, 0).getDate()}`}
-                      <br />
-                      {
-
-                      }
-                      <div className = {styles.divider}/> 
-                  </div> 
-                )
-              } 
-             </div>
+                <div className = {styles.itemSpacer}></div>
+                {
+                  dailyInfo.map((day, i) => 
+                    <div className = {styles.hourlyItem}>
+                        {`${numToMonth(offsetTime(currentTime, 0, 0, 0, i).getMonth())} ${offsetTime(currentTime, 0, 0, 0, i).getDate()}`}
+                        <br />
+                        {`High: ${Math.round(day.temp.max)}°F`}
+                        <br />
+                        {`Low: ${Math.round(day.temp.min)}°F`}
+                        <br />
+                        {`Wind: ${Math.round(day.wind_speed)} MPH`}
+                        <div className = {styles.divider}/> 
+                    </div> 
+                  )
+                } 
+              </div>
           </div>
       </div>
     );        
@@ -126,6 +174,11 @@ function App() {
           <input onChange = {e => {setSearch(e.target.value)}}></input>
           <button onClick = {e => {setSearching(!searching)}}>Search</button>
         </div>
+        <SimpleBar style={{ height: '300px' }}>
+          {[...Array(50)].map((x, i) =>
+            <p key={i} className="odd">Some content</p>
+          )}
+        </SimpleBar>
       </div>
     )
   }

@@ -9,6 +9,8 @@
     height:100%;
     width: 200px;
     text-align:center;
+    border: 2px solid black;
+    margin-left: -2px;
 }
 
 .dailyItem{
@@ -26,9 +28,19 @@
 }
 
 .divider{
+    display: none;
     position: relative;
     top: -30px;
     height:150px;
     width:2px;
     background-color:black;
+}
+
+.itemSpacer{
+    margin-left: 2px;
+    display:inline;
+}
+
+.scrollableWeather{
+    height: 200px;
 }
