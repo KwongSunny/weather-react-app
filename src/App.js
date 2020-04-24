@@ -15,7 +15,7 @@ function App() {
   const [showingHour, setShowingHour] = useState(true);
   const unit = "imperial";
   const appID = "6dd2e40e4f5e4bef22ad159ca06b9dd7";
-  const testArr = [1, 2, 3, 4, 5, 6, 7, 8,9, 10, 11, 12, 13, 14, 15]; 
+  let dailyScroll = undefined;
 
   //converts 0-6 to the day of the week
   const numToDay = (num) => {
@@ -63,14 +63,6 @@ function App() {
     alternateElement.style.display = "none";
   }
 
-  const popDailyInfo = () => {
-    if(dailyInfo.length === 8)
-    {
-      dailyInfo.pop();
-      return dailyInfo;
-    }
-  }
-
   useEffect(() => {
     if(search !== undefined)
     {
@@ -89,7 +81,6 @@ function App() {
       .then(res => {
         setHourlyInfo(res.data.hourly);
         setDailyInfo(res.data.daily);
-        console.log(res.data.daily);
       });
     }
   }, [location])
@@ -97,15 +88,13 @@ function App() {
   useEffect(() => {
     if(dailyInfo !== undefined && dailyInfo.length === 8){
       dailyInfo.pop();
-      return dailyInfo;
     }
   }, [dailyInfo])
-
 
   if(location !== undefined && hourlyInfo !== undefined && dailyInfo !== undefined)
   {
     return (
-      <div className="App">
+      <div className={styles.app}>
           <div className = {styles.searchBar}>
               <input onChange = {e => {setSearch(e.target.value)}}></input>
               <button onClick = {e => {setSearching(!searching)}}>Search</button>
@@ -149,7 +138,7 @@ function App() {
                 <div className = {styles.itemSpacer}></div>
                 {
                   dailyInfo.map((day, i) => 
-                    <div className = {styles.hourlyItem}>
+                    <div className = {styles.dailyItem}>
                         {`${numToMonth(offsetTime(currentTime, 0, 0, 0, i).getMonth())} ${offsetTime(currentTime, 0, 0, 0, i).getDate()}`}
                         <br />
                         {`High: ${Math.round(day.temp.max)}°F`}
