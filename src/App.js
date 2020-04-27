@@ -134,7 +134,7 @@ function App() {
                   )
                 }
               </SimpleBar>
-              <div id = "dailyScroll" className = {styles.sevenDay}>
+              <SimpleBar id = "dailyScroll" className = {styles.sevenDay}>
                 <div className = {styles.itemSpacer}></div>
                 {
                   dailyInfo.map((day, i) => 
@@ -150,7 +150,7 @@ function App() {
                     </div> 
                   )
                 } 
-              </div>
+              </SimpleBar>
           </div>
       </div>
     );        

@@ -1,5 +1,7 @@
 .app{
     width: 500px;
+    background-color: #758194;
+    font: "Trebuchet MS", Helvetica, sans-serif;
 }
 
 .hourly{
@@ -15,6 +17,7 @@
     text-align:center;
     border: 2px solid black;
     margin-left: -2px;
+    background-color: #576478;
 }
 
 .dailyItem{
@@ -24,6 +27,7 @@
     text-align:center;
     border: 2px solid black;
     margin-left: -2px;
+    background-color: #576478;
 }
 
 .sevenDay{
@@ -49,4 +53,7 @@
 
 .scrollableWeather{
     height: 200px;
+    width: 96%;
+    margin-left: 2%;
+    margin-top:2%;
 }
